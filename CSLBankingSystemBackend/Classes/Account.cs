@@ -28,7 +28,7 @@ namespace CSLBankingSystem.Classes
         {
             this.name = "This is a new bank account";
             this.description = "";
-            this.balance = 0;
+            this.balance = 0f;
         }
 
         public void DeductFromBalance(float amount)

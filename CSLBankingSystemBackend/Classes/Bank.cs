@@ -5,11 +5,13 @@ namespace CSLBankingSystem.Classes
     public class Bank
     {
 
+        private static Bank bankInstance = null;
+
         private Dictionary<int, Account> accounts = new Dictionary<int, Account>();
         private Dictionary<int, Customer> customers = new Dictionary<int, Customer>();
-        
 
-        public Bank()
+
+        private Bank()
         {
             // Read from DB and create all customers
             accounts = DbHandler.GetAllAccounts();
@@ -18,11 +20,26 @@ namespace CSLBankingSystem.Classes
             customers = DbHandler.GetAllCustomers();
         }
 
-        public static int CreateBankAccount()
+        public static Bank GetInstance()
+        {
+            if (bankInstance == null)
+            {
+                bankInstance = new Bank();
+            }
+
+            return bankInstance;
+        }
+
+        public static int CreateBankAccount(int customerId)
         {
             Account acc = new Account();
 
             return 1;
+        }
+
+        public void CreateNewCustomer(string firstName, string lastName, string email, int age, string socialNum, string phoneNum, string address, int ZipCode)
+        {
+            new Customer(firstName, lastName, email, age, socialNum, phoneNum, address, ZipCode);
         }
 
         public void MakeTransaction(int transactorId, int fromAccountId, int toAccountID, float amount)

@@ -34,6 +34,8 @@ namespace CSLBankingSystem.Classes
 
 
 
+
+
             // Extract data from DB
 
             // Set customer data
@@ -50,11 +52,11 @@ namespace CSLBankingSystem.Classes
             this.address = address;
             this.zipCode = zipCode;
 
-            int accId = Bank.CreateBankAccount();
+            this.customerId = this.SaveNewCustomer();
+
+            int accId = Bank.CreateBankAccount(this.customerId);
 
             this.accountIds = new List<int>() { accId };
-
-            this.customerId = this.SaveNewCustomer();
 
         }
 

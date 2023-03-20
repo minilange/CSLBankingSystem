@@ -10,7 +10,7 @@ namespace CSLBankingSystemBackend.Classes
     public class DbHandler
     {
 
-        private static string connString = @"Server=tcp:banking-system-ser.database.windows.net,1433;Initial Catalog=BankingDB;Persist Security Info=False;User ID=bsdbAdmin;Password={your_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        private static string connString = @"Server=tcp:banking-system-ser.database.windows.net,1433;Initial Catalog=BankingDB;Persist Security Info=False;User ID=bsdbAdmin;Password=daddyCarl!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
         private static SqlConnection ConnectToDB()
         {
@@ -215,7 +215,7 @@ namespace CSLBankingSystemBackend.Classes
 
         public static int InsertCustomer(Customer customer)
         {
-            string query = $"INSERT INTO Customer ([FirstName], [Lastname], [Email], [Age], [SocialNum], [PhoneNum], [Address], [ZipCode]) VALUES ('{customer.firstName}', '{customer.lastName}', '{customer.email}', {customer.age}, '{customer.socialNum}', '{customer.phoneNum}', {customer.zipCode}) GO SELECT @@IDENTITY as CustomerId";
+            string query = $"INSERT INTO Customers ([FirstName], [Lastname], [Email], [Age], [SocialNum], [PhoneNum], [Address], [ZipCode]) VALUES ('{customer.firstName}', '{customer.lastName}', '{customer.email}', {customer.age}, '{customer.socialNum}', '{customer.phoneNum}', '{customer.address}', {customer.zipCode}); SELECT @@IDENTITY as CustomerId";
             SqlConnection conn = ConnectToDB();
             SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -236,7 +236,7 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.Error.WriteLine(ex.Message);
 
                 return 0;
             }
