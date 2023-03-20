@@ -120,7 +120,7 @@ namespace CSLBankingSystemBackend.Classes
             {
                 Console.WriteLine(ex.Message);
 
-                return 0;
+                return -1;
             }
             finally
             {

@@ -15,7 +15,6 @@ namespace CSLBankingSystemBackend.Controllers
         public string phoneNum { get; set; }
         public string address { get; set; }
         public int zipCode { get; set; }
-
     }
 
     [ApiController]
@@ -30,7 +29,7 @@ namespace CSLBankingSystemBackend.Controllers
         }
 
         [HttpPost]
-        public void Post([FromBody] HttpCustomer customer)
+        public string Post([FromBody] HttpCustomer customer)
         {
             Bank bank = Bank.GetInstance();
 
@@ -38,7 +37,18 @@ namespace CSLBankingSystemBackend.Controllers
 
             bank.CreateNewCustomer(c.firstName, c.lastName, c.email, c.age, c.socialNum, c.phoneNum, c.address, c.zipCode);
 
-            return;
+            return "New customer has been created";
         }
+
+        //[HttpGet]
+        //[Route("[controller]/customer")]
+        //public void Get([)
+        //{
+        //    Bank bank = Bank.GetInstance();
+
+        //    List<stirng> = bank.
+
+        //    return;
+        //}
     }
 }

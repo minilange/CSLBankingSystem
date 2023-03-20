@@ -29,6 +29,18 @@ namespace CSLBankingSystem.Classes
             this.name = "This is a new bank account";
             this.description = "";
             this.balance = 0f;
+
+            this.SaveNewAccount();
+        }
+
+        private int SaveNewAccount()
+        {
+
+            int id = DbHandler.InsertAccount(this);
+
+            this.id = id;
+
+            return this.id;
         }
 
         public void DeductFromBalance(float amount)

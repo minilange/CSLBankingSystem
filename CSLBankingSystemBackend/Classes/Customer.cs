@@ -54,7 +54,9 @@ namespace CSLBankingSystem.Classes
 
             this.customerId = this.SaveNewCustomer();
 
-            int accId = Bank.CreateBankAccount(this.customerId);
+            Bank bank = Bank.GetInstance();
+
+            int accId = bank.CreateBankAccount();
 
             this.accountIds = new List<int>() { accId };
 

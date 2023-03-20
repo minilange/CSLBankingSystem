@@ -20,6 +20,8 @@ namespace CSLBankingSystem.Classes
             customers = DbHandler.GetAllCustomers();
         }
 
+        // Make the Bank class a singleton-class
+        // To ensure everything is handled by the same instance
         public static Bank GetInstance()
         {
             if (bankInstance == null)
@@ -30,16 +32,20 @@ namespace CSLBankingSystem.Classes
             return bankInstance;
         }
 
-        public static int CreateBankAccount(int customerId)
+        public int CreateBankAccount()
         {
             Account acc = new Account();
 
-            return 1;
+            accounts.Add(acc.id, acc);
+
+            return acc.id;
         }
 
         public void CreateNewCustomer(string firstName, string lastName, string email, int age, string socialNum, string phoneNum, string address, int ZipCode)
         {
-            new Customer(firstName, lastName, email, age, socialNum, phoneNum, address, ZipCode);
+            Customer newCustomer = new Customer(firstName, lastName, email, age, socialNum, phoneNum, address, ZipCode);
+
+            customers.Add(newCustomer.customerId, newCustomer);
         }
 
         public void MakeTransaction(int transactorId, int fromAccountId, int toAccountID, float amount)
