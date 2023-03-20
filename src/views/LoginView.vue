@@ -1,25 +1,24 @@
 <template>
-  <div class="container mt-5">
-    <div class="action-prompt m-auto">
-      <h3 class="text-center">LOGIN</h3>
-      <hr />
+  <div class="container">
+    <div class="action-prompt">
+      <h4 class="text-center fw-bold my-4">LOGIN</h4>
       <form>
-        <div class="form-floating mb-3">
-          <input v-model="form.email" type="email" class="form-control" id="floatingEmail"
-            placeholder="name@gmail.com" />
-          <label for="floatingEmail">Email address</label>
+        <div class="form mb-3">
+          <label class="fw-bold" for="Email">EMAIL ADDRESS</label>
+          <input v-model="form.email" type="email" class="form-control" id="Email"
+          placeholder="Name@gmail.com" />
         </div>
-        <div class="form-floating mb-3">
-          <input v-model="form.password" type="password" class="form-control" id="floatingPassword"
+        <div class="form mb-3">
+          <label class="fw-bold" for="Password">PASSWORD</label>
+          <input v-model="form.password" type="password" class="form-control" id="Password"
             placeholder="Password" />
-          <label for="floatingPassword">Password</label>
         </div>
       </form>
-      <button v-on:click="loginUser()" class="btn-transparent btn btn-dark" :disabled="$store.state.searching == true">Login</button>
+      <button v-on:click="loginUser()" class="btn-transparent btn btn-dark" :disabled="$store.state.searching == true">LOGIN <span class="float-end"><font-awesome-icon icon="right-to-bracket" /></span></button>
+      
       <div v-if="$store.state.searching == true" id="searchStatus" class="mt-4 d-flex">
-        <span>Searching...</span>
+        <span>Loggin in...</span>
         <div class="loader"></div>
-
       </div>
 
       <router-link class="text-center nav-link text-white" to="/register"><span>Need an account?</span></router-link>
@@ -28,9 +27,15 @@
 </template>
 
 <style scoped>
-.action-prompt {
-  height: 50%;
-  width: 50%;
+  .container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+  }
+.action-prompt{
+  height: fit-content;
+  width: 35%;
 }
 
 span {
