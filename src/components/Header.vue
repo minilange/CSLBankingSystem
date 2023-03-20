@@ -3,11 +3,11 @@
   <nav class="navbar navbar-expand-lg navbar-dark navbar-top">
     <div class="container-fluid container">
       <div v-if="!this.$store.state.user.hasOwnProperty('userId')">
-        <router-link class="navbar-brand d-lg-none fw-bold text-white" to="/login">Login</router-link>
+        <router-link class="navbar-brand d-lg-none fw-bold text-black" to="/login">Login</router-link>
       </div>
-      <router-link class="navbar-brand fw-bold text-white" to="/">
-        <!-- EASIER<span class="text-secondary fw-bold">PARK</span> -->
-        <img src="../assets/easierpark-logo.webp" height="25" width="186" alt="EASIERPARK LOGO" />
+      <router-link class="navbar-brand fw-bold text-black" to="/">
+        CSL BANKING SYSTEM
+        <!-- <img src="" height="25" width="186" alt="CSL BANKING LOGO" /> -->
       </router-link>
       <button type="button" id="navbarBtn" aria-label="Navbar button" class="navbar-toggler on-top"
         data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -15,19 +15,9 @@
       </button>
       <div class="collapse navbar-collapse navbar-right navbar-side" id="navbarCollapse">
         <div class="navbar-nav ms-auto gap-lg-5 fw-bold">
-          <router-link v-if="this.$store.state.user.hasOwnProperty('userId')"
-            class="nav-item nav-link text-white d-none d-lg-block" to="/new-parking"><span>NEW
-              PARKING</span></router-link>
-          <router-link v-if="!this.$store.state.user.hasOwnProperty('userId')"
-            class="nav-item nav-link text-white d-none d-lg-block" to="/login"><span>LOGIN</span></router-link>
-          <!-- <router-link class="nav-item nav-link text-white" to="/areas"><span>AREAS</span></router-link> -->
-          <router-link class="nav-item nav-link text-white" to="/about"><span>ABOUT US</span></router-link>
-          <router-link v-if="this.$store.state.user.hasOwnProperty('userId')" class="nav-item nav-link text-white"
-            to="/profile"><span>PROFILE</span></router-link>
-          <router-link v-if="this.$store.state.user.hasOwnProperty('userId')" class="nav-item nav-link text-white"
-            to="/old-parkings"><span>MY PARKINGS</span></router-link>
-          <a v-if="this.$store.state.user.hasOwnProperty('userId')" @click="this.logOut"
-            class="nav-item nav-link text-white"><span>LOG OUT</span></a>
+          <router-link v-if="!this.$store.state.user.hasOwnProperty('userId')" class="nav-item nav-link text-black d-none d-lg-block fw-bold" to="/login">LOGIN</router-link>
+          <router-link class="nav-item nav-link text-black fw-bold" to="/about">ABOUT US</router-link>          
+          <a v-if="this.$store.state.user.hasOwnProperty('userId')" @click="this.logOut" class="nav-item nav-link text-black fw-bold"><span>LOG OUT</span></a>
         </div>
       </div>
     </div>
@@ -112,5 +102,9 @@ export default {
   .navbar-toggler.collapsed~.navbar-collapse {
     transition: right 500ms ease-in-out;
   }
+}
+
+.navbar {
+  padding-top: 1.5%;
 }
 </style>
