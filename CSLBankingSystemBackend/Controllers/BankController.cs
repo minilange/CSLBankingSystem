@@ -24,7 +24,7 @@ namespace CSLBankingSystemBackend.Controllers
     public class HttpAtmAction
     {
         public int customerId { get; set; }
-        public int accountId{ get; set; }
+        public int accountId { get; set; }
         public float amount { get; set; }
     }
 
@@ -49,6 +49,14 @@ namespace CSLBankingSystemBackend.Controllers
 
         /// <summary>
         /// 
+        ///     --- Int status codes ---
+        ///     
+        ///         0 = Success
+        ///         1 = Exception thrown
+        ///         2 = Invalid token
+        /// 
+        /// 
+        /// 
         /// 
         ///     Login
         ///     Sign up
@@ -66,14 +74,14 @@ namespace CSLBankingSystemBackend.Controllers
 
         [HttpGet]
         [Route("api/Login")]
-        public string LoginGet([FromBody] string? value, string email, string password)
+        public string LoginGet([FromBody] string? tokenHash, string email, string password)
         {
             // Check a token value is present
-            if (value != null)
+            if (tokenHash != null)
             {
                 Bank bank = Bank.GetInstance();
 
-                Token token = bank.IsTokenActive(value);
+                Token token = bank.IsTokenActive(tokenHash);
 
                 // Checks if token value is in an active token
                 if (token != null)
@@ -123,11 +131,16 @@ namespace CSLBankingSystemBackend.Controllers
 
         [HttpPost]
         [Route("api/Signup")]
-        public int SignUpPost([FromBody] HttpCustomer customer)
+        public int SignUpPost([FromBody] string tokenHash, HttpCustomer customer)
         {
             Bank bank = Bank.GetInstance();
 
             HttpCustomer c = customer;
+
+            if (!IsTokenValid(tokenHash))
+            {
+                return 2;
+            }
 
             try
             {
@@ -146,9 +159,15 @@ namespace CSLBankingSystemBackend.Controllers
 
         [HttpGet]
         [Route("api/CustomerAccounts")]
-        public string GetCustomerAccounts([FromBody] int customerId)
+        public string GetCustomerAccounts([FromBody] string tokenHash, int customerId)
         {
             Bank bank = Bank.GetInstance();
+
+            if (!IsTokenValid(tokenHash))
+            {
+                return "Invalid token";
+            }
+
 
             List<Account> accounts = bank.GetAccountsFromCustomerId(customerId);
 
@@ -160,33 +179,48 @@ namespace CSLBankingSystemBackend.Controllers
 
         [HttpPatch]
         [Route("api/Deposit")]
-        public bool Deposit([FromBody] HttpAtmAction action)
+        public int Deposit([FromBody] string tokenHash, HttpAtmAction action)
         {
             Bank bank = Bank.GetInstance();
 
-            bool success = bank.MakeDeposit(action.accountId, action.customerId, action.amount);
+            if (!IsTokenValid(tokenHash))
+            {
+                return 2;
+            }
+
+            int success = bank.MakeDeposit(action.accountId, action.customerId, action.amount);
 
             return success;
         }
 
         [HttpPatch]
         [Route("api/Withdrawal")]
-        public bool Withdrawal([FromBody] HttpAtmAction action)
+        public int Withdrawal([FromBody] string tokenHash, HttpAtmAction action)
         {
             Bank bank = Bank.GetInstance();
 
-            bool success = bank.MakeWithdrawal(action.accountId, action.customerId, action.amount);
+            if (!IsTokenValid(tokenHash))
+            {
+                return 2;
+            }
+
+            int success = bank.MakeWithdrawal(action.accountId, action.customerId, action.amount);
 
             return success;
         }
 
         [HttpPatch]
         [Route("api/MakeTransaction")]
-        public bool MakeTransaction([FromBody] HttpTransaction action)
+        public int MakeTransaction([FromBody] string tokenHash, HttpTransaction action)
         {
             Bank bank = Bank.GetInstance();
 
-            bool success = bank.MakeTransaction(action.CustomerId, action.fromAccountId, action.toAccountId, action.amount);
+            if (!IsTokenValid(tokenHash))
+            {
+                return 2;
+            }
+
+            int success = bank.MakeTransaction(action.CustomerId, action.fromAccountId, action.toAccountId, action.amount);
 
             return success;
         }
@@ -228,6 +262,20 @@ namespace CSLBankingSystemBackend.Controllers
 
         //    return serializedCustomers;
         //}
+
+        private static bool IsTokenValid(string tokenHash)
+        {
+            Bank bank = Bank.GetInstance();
+
+            Token token = bank.IsTokenActive(tokenHash);
+
+            if (token == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         private static string GetSHA256Hash(string input)
         {

@@ -128,41 +128,41 @@ namespace CSLBankingSystem.Classes
             DbHandler.InsertAccountBinder(accId, newCustomer.customerId);
         }
 
-        public bool MakeDeposit(int customerId, int accountId, float amount)
+        public int MakeDeposit(int customerId, int accountId, float amount)
         {
             try
             {
                 this.MakeTransaction(customerId, atmId, accountId, amount);
                 
-                return true;
+                return 0;
             }
             catch (Exception ex)
             {
                 string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 Console.Error.WriteLine($"{funcName} - {ex}");
                 
-                return false;
+                return 1;
             }
         }
 
-        public bool MakeWithdrawal(int customerId, int accountId, float amount)
+        public int MakeWithdrawal(int customerId, int accountId, float amount)
         {
             try
             {
                 this.MakeTransaction(customerId, accountId, atmId, amount);
                 
-                return true;
+                return 0;
             }
             catch (Exception ex)
             {
                 string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 Console.Error.WriteLine($"{funcName} - {ex}");
                 
-                return false;
+                return 1;
             }
         }
 
-        public bool MakeTransaction(int transactorId, int fromAccountId, int toAccountId, float amount)
+        public int MakeTransaction(int transactorId, int fromAccountId, int toAccountId, float amount)
         {
 
             Account fromAccount = this.accounts[fromAccountId];
@@ -181,7 +181,7 @@ namespace CSLBankingSystem.Classes
                 string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 Console.Error.WriteLine($"{funcName} - {ex}");
 
-                return false;
+                return 1;
             }
 
             // Checks if the added balance is allowed
@@ -198,7 +198,7 @@ namespace CSLBankingSystem.Classes
                 fromAccount.AddToBalance(amount);
                 string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
                 Console.Error.WriteLine($"{funcName} - {ex}");
-                return false;
+                return 1;
             }
 
             Transaction transaction = new Transaction(
@@ -211,7 +211,7 @@ namespace CSLBankingSystem.Classes
 
             fromAccount.AddTransaction(transaction);
 
-            return true;
+            return 0;
         }
     }
 }
