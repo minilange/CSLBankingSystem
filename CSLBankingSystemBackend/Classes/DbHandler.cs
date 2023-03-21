@@ -32,7 +32,7 @@ namespace CSLBankingSystemBackend.Classes
 
         public static List<Token> GetAllActiveTokens()
         {
-            string query = $"SELECT [Value], [CustomerId], [Timestamp] FROM Tokens WHERE [Timestamp] WHERE BETWEEN DATEADD(DAY, -1, [Timestamp]) AND [Timestamp]";
+            string query = $"SELECT [Value], [CustomerId], [Timestamp] FROM Tokens WHERE [Timestamp] BETWEEN DATEADD(DAY, -1, [Timestamp]) AND [Timestamp]";
             SqlConnection conn = ConnectToDB();
             SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -49,7 +49,7 @@ namespace CSLBankingSystemBackend.Classes
                             Convert.ToString(reader["value"]),
                             Convert.ToInt32(reader["customerId"]),
                             Convert.ToString(reader["timestamp"])
-                            );
+                        );
 
                         tokens.Add(token);
                     }

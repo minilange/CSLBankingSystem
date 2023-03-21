@@ -21,6 +21,22 @@ namespace CSLBankingSystemBackend.Controllers
         public int zipCode { get; set; }
     }
 
+    public class HttpAtmAction
+    {
+        public int customerId { get; set; }
+        public int accountId{ get; set; }
+        public float amount { get; set; }
+    }
+
+    public class HttpTransaction
+    {
+        public int CustomerId { get; set; }
+        public int fromAccountId { get; set; }
+        public int toAccountId { get; set; }
+        public float amount { get; set; }
+
+    }
+
     [ApiController]
     public class BankController : ControllerBase
     {
@@ -49,15 +65,28 @@ namespace CSLBankingSystemBackend.Controllers
 
 
         [HttpGet]
-        [Route("api/Login/")]
-        public string LoginGet([FromBody] string? token, string email, string password)
+        [Route("api/Login")]
+        public string LoginGet([FromBody] string? value, string email, string password)
         {
-
-            if  (token != null)
+            // Check a token value is present
+            if (value != null)
             {
                 Bank bank = Bank.GetInstance();
-                bank.IsTokenActive(token);
 
+                Token token = bank.IsTokenActive(value);
+
+                // Checks if token value is in an active token
+                if (token != null)
+                {
+                    Customer customer = bank.GetCustomerFromToken(token);
+
+                    if (customer != null)
+                    {
+                        string json = JsonSerializer.Serialize(customer);
+
+                        return json;
+                    }
+                }
             }
 
 
@@ -69,14 +98,21 @@ namespace CSLBankingSystemBackend.Controllers
 
                 Customer customer = bank.GetCustomerFromId(id);
 
-                string shaToken = GetSHA256Hash($"{customer.customerId} - {DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss")}");
+                if (customer != null)
+                {
+                    string shaToken = GetSHA256Hash($"{customer.customerId} - {DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss")}");
 
-                List<Object> loginList = new List<Object>() { customer, shaToken };
+                    List<Object> loginList = new List<Object>() { customer, shaToken };
 
 
-                string json = JsonSerializer.Serialize(loginList);
+                    string json = JsonSerializer.Serialize(loginList);
 
-                return json;
+                    return json;
+                }
+                else
+                {
+                    return "";
+                }
 
             }
             else
@@ -86,11 +122,76 @@ namespace CSLBankingSystemBackend.Controllers
         }
 
         [HttpPost]
-        [Route("api/signup")]
-        public string SignUpPost()
+        [Route("api/Signup")]
+        public int SignUpPost([FromBody] HttpCustomer customer)
         {
-            return "";
+            Bank bank = Bank.GetInstance();
+
+            HttpCustomer c = customer;
+
+            try
+            {
+                bank.CreateNewCustomer(c.firstName, c.lastName, c.email, c.password, c.age, c.socialNum, c.phoneNum, c.address, c.zipCode);
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
+
+                return 1;
+            }
         }
+
+        [HttpGet]
+        [Route("api/CustomerAccounts")]
+        public string GetCustomerAccounts([FromBody] int customerId)
+        {
+            Bank bank = Bank.GetInstance();
+
+            List<Account> accounts = bank.GetAccountsFromCustomerId(customerId);
+
+            string json = JsonSerializer.Serialize(accounts);
+
+            return json;
+
+        }
+
+        [HttpPatch]
+        [Route("api/Deposit")]
+        public bool Deposit([FromBody] HttpAtmAction action)
+        {
+            Bank bank = Bank.GetInstance();
+
+            bool success = bank.MakeDeposit(action.accountId, action.customerId, action.amount);
+
+            return success;
+        }
+
+        [HttpPatch]
+        [Route("api/Withdrawal")]
+        public bool Withdrawal([FromBody] HttpAtmAction action)
+        {
+            Bank bank = Bank.GetInstance();
+
+            bool success = bank.MakeWithdrawal(action.accountId, action.customerId, action.amount);
+
+            return success;
+        }
+
+        [HttpPatch]
+        [Route("api/MakeTransaction")]
+        public bool MakeTransaction([FromBody] HttpTransaction action)
+        {
+            Bank bank = Bank.GetInstance();
+
+            bool success = bank.MakeTransaction(action.CustomerId, action.fromAccountId, action.toAccountId, action.amount);
+
+            return success;
+        }
+
+
 
 
         //[HttpPost]
