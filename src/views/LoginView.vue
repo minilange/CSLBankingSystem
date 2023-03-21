@@ -14,7 +14,7 @@
             placeholder="Password" />
         </div>
       </form>
-      <button v-on:click="loginUser()" class="btn-transparent btn btn-dark" :disabled="$store.state.searching == true">LOGIN <span class="float-end"><font-awesome-icon icon="right-to-bracket" /></span></button>
+      <button v-on:click="loginUser()" class="btn-transparent btn btn-dark" :disabled="$store.state.searching == true || form.password.length == 0 || form.email.length == 0" >LOGIN <span class="float-end"><font-awesome-icon icon="right-to-bracket" /></span></button>
       
       <div v-if="$store.state.searching == true" id="searchStatus" class="mt-4 d-flex">
         <span>Loggin in...</span>

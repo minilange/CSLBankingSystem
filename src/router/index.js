@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import AccountView from '../views/AccountView.vue'
 // import store from '../store/index.js'
 
 // function isLoggedIn() {
@@ -41,6 +42,12 @@ const routes = [
     path: '/register',
     name: 'registers',
     component: RegisterView
+  },
+  {
+    path: '/account',
+    name: 'account',
+    component: AccountView,
+    // beforeEnter: [isLoggedIn]
   },
   {
     path: "/:catchAll(.*)",

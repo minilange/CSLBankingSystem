@@ -3,21 +3,53 @@
   <nav class="navbar navbar-expand-lg navbar-dark navbar-top">
     <div class="container-fluid container">
       <div v-if="!this.$store.state.user.hasOwnProperty('userId')">
-        <router-link class="navbar-brand d-lg-none fw-bold text-black" to="/login">Login</router-link>
+        <router-link
+          class="navbar-brand d-lg-none fw-bold text-black"
+          to="/login"
+          >Login</router-link
+        >
       </div>
       <router-link class="navbar-brand fw-bold text-black" to="/">
-        CSL BANKING SYSTEM
+        <h1>CSL BANKING $Y$TEM</h1>
         <!-- <img src="" height="25" width="186" alt="CSL BANKING LOGO" /> -->
       </router-link>
-      <button type="button" id="navbarBtn" aria-label="Navbar button" class="navbar-toggler on-top"
-        data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+      <button
+        type="button"
+        id="navbarBtn"
+        aria-label="Navbar button"
+        class="navbar-toggler on-top"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarCollapse"
+      >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse navbar-right navbar-side" id="navbarCollapse">
+      <div
+        class="collapse navbar-collapse navbar-right navbar-side"
+        id="navbarCollapse"
+      >
         <div class="navbar-nav ms-auto gap-lg-5 fw-bold">
-          <router-link v-if="!this.$store.state.user.hasOwnProperty('userId')" class="nav-item nav-link text-black d-none d-lg-block fw-bold" to="/login">LOGIN</router-link>
-          <router-link class="nav-item nav-link text-black fw-bold" to="/about">ABOUT US</router-link>          
-          <a v-if="this.$store.state.user.hasOwnProperty('userId')" @click="this.logOut" class="nav-item nav-link text-black fw-bold"><span>LOG OUT</span></a>
+          <router-link
+            v-if="!this.$store.state.user.hasOwnProperty('userId')"
+            class="nav-item nav-link text-black d-none d-lg-block fw-bold"
+            to="/login"
+          >
+            <span>LOGIN</span>
+          </router-link>
+          <router-link
+            v-if="!this.$store.state.user.hasOwnProperty('userId')"
+            class="nav-item nav-link text-black d-none d-lg-block fw-bold"
+            to="/account"
+            ><span>ACCOUNT</span></router-link
+          >
+          <router-link class="nav-item nav-link text-black fw-bold" to="/about"
+            ><span>ABOUT US</span></router-link
+          >
+          <a
+            v-if="this.$store.state.user.hasOwnProperty('userId')"
+            @click="this.logOut"
+            class="nav-item nav-link text-black fw-bold"
+            ><span>LOG OUT</span></a
+          >
         </div>
       </div>
     </div>
@@ -26,17 +58,16 @@
 
 <script>
 export default {
-  name: 'HeaderFront',
+  name: "HeaderFront",
   methods: {
     logOut() {
       this.$store.dispatch("logOut");
       // Remove local storage
       localStorage.removeItem("userInfo");
       this.$router.push("/login");
-    }
+    },
   },
   mounted() {
-
     // Get userInfo from localStorage, if it exists
     const userInfo = localStorage.getItem("userInfo")
       ? JSON.parse(localStorage.getItem("userInfo"))
@@ -54,10 +85,8 @@ export default {
         this.$store.dispatch("setUserInfoFromLocalStorage");
       }
     }
-  }
-}
-
-
+  },
+};
 </script>
 
 <style scoped>
@@ -65,8 +94,16 @@ export default {
   z-index: 99999;
 }
 
-.navbar-brand>img {
+.navbar-brand > img {
   margin-left: 20px;
+}
+
+.navbar-brand h1 {
+  font-weight: 800;
+}
+.navbar-nav span {
+  font-size: 1.4rem;
+  cursor: pointer;
 }
 
 @media (max-width: 991px) {
@@ -85,7 +122,7 @@ export default {
     z-index: 9999;
   }
 
-  .navbar-brand>img {
+  .navbar-brand > img {
     margin-left: 0px;
   }
 
@@ -99,7 +136,7 @@ export default {
     transition: right 300ms ease-in-out;
   }
 
-  .navbar-toggler.collapsed~.navbar-collapse {
+  .navbar-toggler.collapsed ~ .navbar-collapse {
     transition: right 500ms ease-in-out;
   }
 }

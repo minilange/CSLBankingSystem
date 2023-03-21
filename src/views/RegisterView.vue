@@ -1,47 +1,102 @@
 <template>
   <div class="container mt-5">
     <div class="action-prompt m-auto">
-      <h3 class="text-center">REGISTER</h3>
+      <h3 class="text-center fw-bold">REGISTER</h3>
       <hr />
       <form>
-        <!-- Firstname -->
-        <div class="form-floating mb-3">
-          <input
-            v-model="form.firstname"
-            type="text"
-            class="form-control"
-            id="floatingFirstname"
-            placeholder="Your First name"
-          />
-          <label for="floatingName">First name</label>
+        <div class="row">
+          <div class="col-6">
+            <!-- Firstname -->
+            <div class="form-floating mb-3">
+              <input
+                v-model="form.firstname"
+                type="text"
+                class="form-control"
+                id="floatingFirstname"
+                placeholder="Your First name"
+              />
+              <label for="floatingName">First name</label>
+            </div>
+          </div>
+          <div class="col-6">
+            <!-- Lastname -->
+            <div class="form-floating mb-3">
+              <input
+                v-model="form.lastname"
+                type="text"
+                class="form-control"
+                id="floatingLastname"
+                placeholder="Your Last name"
+              />
+              <label for="floatingName">Last name</label>
+            </div>
+          </div>
         </div>
-        <!-- Lastname -->
-        <div class="form-floating mb-3">
-          <input
-            v-model="form.lastname"
-            type="text"
-            class="form-control"
-            id="floatingLastname"
-            placeholder="Your Last name"
-          />
-          <label for="floatingName">Last name</label>
+        <div class="row">
+          <div class="col-4">
+            <!-- CPR -->
+            <div class="form-floating mb-3">
+              <input
+                v-model="form.cpr"
+                type="text"
+                class="form-control"
+                id="floatingCPR"
+                placeholder="CPR"
+              />
+              <label for="floatingAddress">CPR</label>
+            </div>
+          </div>
+          <div class="col-8">
+            <!-- Email -->
+            <div class="form-floating mb-3">
+              <input
+                v-model="form.email"
+                type="email"
+                class="form-control"
+                id="floatingEmail"
+                placeholder="name@gmail.com"
+              />
+              <label for="floatingEmail">Email address</label>
+            </div>
+          </div>
         </div>
-        <!-- Email -->
-        <div class="form-floating mb-3">
-          <input
-            v-model="form.email"
-            type="email"
-            class="form-control"
-            id="floatingEmail"
-            placeholder="name@gmail.com"
-          />
-          <label for="floatingEmail">Email address</label>
+        <div class="row">
+          <div class="col-4">
+            <!-- Zipcode -->
+            <div class="form-floating mb-3">
+              <input
+                v-model="form.zipcode"
+                type="text"
+                class="form-control"
+                id="floatingZipcode"
+                placeholder="Zipcode"
+              />
+              <label for="floatingZipcode">Zipcode</label>
+            </div>
+          </div>
+          <div class="col-8">
+            <!-- Address -->
+            <div class="form-floating mb-3">
+              <input
+                v-model="form.address"
+                type="text"
+                class="form-control"
+                id="floatingAddress"
+                placeholder="Your Address"
+              />
+              <label for="floatingAddress">Address</label>
+            </div>
+          </div>
         </div>
         <div class="row">
           <!-- CC_Code -->
           <div class="col-lg-3">
             <div class="form-floating mb-3">
-              <select v-model="form.ccCode" class="form-control" id="floatingCC-code">
+              <select
+                v-model="form.ccCode"
+                class="form-control"
+                id="floatingCC-code"
+              >
                 <option v-for="code in cc_codes" :value="code" :key="code">
                   {{ code.dial_code }}, {{ code.code }}
                 </option>
@@ -94,12 +149,24 @@
         <h5 class="text-danger" v-if="form.password != form.repeatPassword">
           Passwords doesn't match!
         </h5>
-        <h5 class="text-danger" v-if="form.password == form.repeatPassword && passwordCheck != true">
+        <h5
+          class="text-danger"
+          v-if="form.password == form.repeatPassword && passwordCheck != true"
+        >
           Passwords doesn't meet the requirements
         </h5>
       </form>
-      <button v-on:click="registerUser()" :disabled="form.password != form.repeatPassword || passwordCheck == false || form.password.length == 0" class="btn-transparent btn btn-dark">
-        Register
+      <button
+        v-on:click="registerUser()"
+        :disabled="
+          form.password != form.repeatPassword ||
+          passwordCheck == false ||
+          form.password.length == 0
+        "
+        class="btn-transparent btn btn-dark"
+      >
+        <span class="float-end"><font-awesome-icon icon="user-plus" /></span
+        >Register
       </button>
       <router-link class="text-center nav-link text-white" to="/login"
         ><span>Already have an account?</span></router-link
@@ -119,7 +186,7 @@ span {
 }
 
 @media (max-width: 991px) {
-  .action-prompt{
+  .action-prompt {
     width: 80%;
   }
 }
@@ -128,7 +195,7 @@ span {
 <script>
 import json from "@/assets/CountryCodes.json";
 import axios from "axios";
-import SHA256 from "crypto-js/sha256"
+import SHA256 from "crypto-js/sha256";
 
 export default {
   data() {
@@ -141,22 +208,23 @@ export default {
         phone: "",
         ccCode: {},
         repeatPassword: "",
+        address: "",
+        cpr: "",
       },
       passwordCheck: true,
       cc_codes: json.sort(this.compareDialCode),
     };
   },
   watch: {
-    'form.password': function (value) {
-      const check = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/g
+    "form.password": function (value) {
+      const check =
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/g;
       if (check.test(value)) {
-        this.passwordCheck = true
+        this.passwordCheck = true;
+      } else {
+        this.passwordCheck = false;
       }
-      else{
-        this.passwordCheck = false
-
-      }
-    }
+    },
   },
   methods: {
     compareDialCode: function (a, b) {
@@ -166,12 +234,22 @@ export default {
       );
     },
     registerUser: function () {
-      this.form.apiSend = {firstname: this.form.firstname, lastname: this.form.lastname, email: this.form.email, phone: this.form.phone, password: SHA256(this.form.password, this.$store.state.secret).toString(), ccCode: this.form.ccCode.code}
+      this.form.apiSend = {
+        firstname: this.form.firstname,
+        lastname: this.form.lastname,
+        email: this.form.email,
+        phone: this.form.phone,
+        password: SHA256(
+          this.form.password,
+          this.$store.state.secret
+        ).toString(),
+        ccCode: this.form.ccCode.code,
+      };
       axios
         .post(this.$store.state.api + "/register/", this.form.apiSend)
         .then((response) => {
           console.log(response);
-          alert("User registered successfully! Please login to continue.")
+          alert("User registered successfully! Please login to continue.");
           this.$router.push("/login");
         })
         .catch((error) => {

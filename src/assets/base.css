@@ -71,9 +71,10 @@
 
 body {
   min-height: 100vh;
-  color: var(--vt-c-white-soft) !important;
+  color: var(--vt-c-black) !important;
   background-image: url("./background.jpeg");
   background-size: cover;
+  backdrop-filter: blur(3px);
   background-position-y: 55%;
   /* background-color: black !important; */
   transition: color 0.5s, background-color 0.5s;
