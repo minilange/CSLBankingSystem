@@ -10,7 +10,7 @@ namespace CSLBankingSystem.Classes
         public int id { get; set; }
         public string name { get; set; }
         public string description { get; set; }
-        public float balance { get; set; }
+        public float balance { get; private set; }
         public List<Transaction> transactions { get; set; }
 
 
@@ -21,7 +21,7 @@ namespace CSLBankingSystem.Classes
             this.description = description;
             this.balance = balance;
 
-            transactions = DbHandler.GetAllTransactions(this.id);
+            this.transactions = DbHandler.GetAllTransactions(this.id);
         }
 
         public Account()
@@ -29,8 +29,12 @@ namespace CSLBankingSystem.Classes
             this.name = "This is a new bank account";
             this.description = "";
             this.balance = 0f;
+            this.transactions = new List<Transaction>();
 
-            this.SaveNewAccount();
+            int id = this.SaveNewAccount();
+
+            this.id = id;
+
         }
 
         private int SaveNewAccount()
@@ -72,6 +76,7 @@ namespace CSLBankingSystem.Classes
         public void AddTransaction(Transaction transaction)
         {
             DbHandler.AddTransaction(transaction);
+            DbHandler.UpdateBalanceFromTransaction(transaction);
             transactions.Add(transaction);
         }
 

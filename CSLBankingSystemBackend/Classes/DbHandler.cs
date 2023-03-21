@@ -2,24 +2,106 @@
 using CSLBankingSystem.Interfaces;
 using System;
 using System.Data;
+using System.Text;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Security.Cryptography;
 
 namespace CSLBankingSystemBackend.Classes
 {
     public class DbHandler
     {
 
-        private static string connString = @"Server=tcp:banking-system-ser.database.windows.net,1433;Initial Catalog=BankingDB;Persist Security Info=False;User ID=bsdbAdmin;Password=daddyCarl!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        private static string connString = SQLConnectionString.connString;
 
         private static SqlConnection ConnectToDB()
         {
-            SqlConnection conn = new SqlConnection(connString);
+            try
+            {
+                SqlConnection conn = new SqlConnection(connString);
+                return conn;
+            }
+            catch (Exception ex)
+            {
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
+                return null;
+            }
 
-            return conn;
+        }
+
+        public static List<Token> GetAllActiveTokens()
+        {
+            string query = $"SELECT [Value], [CustomerId], [Timestamp] FROM Tokens WHERE [Timestamp] WHERE BETWEEN DATEADD(DAY, -1, [Timestamp]) AND [Timestamp]";
+            SqlConnection conn = ConnectToDB();
+            SqlCommand cmd = new SqlCommand(query, conn);
+
+            List<Token> tokens = new List<Token>();
+
+            try
+            {
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Token token = new Token(
+                            Convert.ToString(reader["value"]),
+                            Convert.ToInt32(reader["customerId"]),
+                            Convert.ToString(reader["timestamp"])
+                            );
+
+                        tokens.Add(token);
+                    }
+                }
+
+                return tokens;
+            }
+            catch (Exception ex)
+            {
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
+
+                return new List<Token>();
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
         }
 
         #region Accounts
+        public static void UpdateBalanceFromTransaction(Transaction transaction)
+        {
+            string query = $"UPDATE Accounts SET balance = balance - {transaction.amount} WHERE id = {transaction.fromAccountId}; UPDATE Accounts SET balance = balance + {transaction.amount} WHERE id = {transaction.toAccountId}";
+            SqlConnection conn = ConnectToDB();
+            SqlCommand cmd = new SqlCommand(query, conn);
+
+            try
+            {
+                conn.Open();
+                cmd.ExecuteNonQuery();
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
+
+                return;
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+        }
 
         public static void AddTransaction(Transaction transaction)
         {
@@ -36,7 +118,8 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
 
                 return;
             }
@@ -80,7 +163,8 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
 
                 return new List<Transaction>();
             }
@@ -97,7 +181,7 @@ namespace CSLBankingSystemBackend.Classes
 
         public static int InsertAccount(Account account)
         {
-            string query = $"INSERT INTO Customer ([Name], [Description], [Balance]) VALUES ('{account.name}', '{account.description}', {account.balance}) GO SELECT @@IDENTITY as AccountId";
+            string query = $"INSERT INTO Accounts ([Name], [Description], [Balance]) VALUES ('{account.name}', '{account.description}', {account.balance}); SELECT @@IDENTITY as AccountId";
             SqlConnection conn = ConnectToDB();
             SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -118,7 +202,8 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
 
                 return -1;
             }
@@ -162,7 +247,8 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
 
                 return new Dictionary<int, Account>();
             }
@@ -176,10 +262,87 @@ namespace CSLBankingSystemBackend.Classes
         }
         #endregion
 
+        public static void InsertAccountBinder(int accountId, int customerId)
+        {
+            string query = $"INSERT INTO AccountBinders ([AccountId], [CustomerId]) VALUES ({accountId}, {customerId})";
+            SqlConnection conn = ConnectToDB();
+            SqlCommand cmd = new SqlCommand(query, conn);
+
+            try
+            {
+                conn.Open();
+                cmd.ExecuteNonQuery();
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
+
+                return;
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+        }
+
+
         #region Customers
+        public static int CheckPasswordToEmail(string email, string password)
+        {
+            string query = $"SELECT [CustomerId] FROM Customers WHERE Email = '{email}' and Password = '{password}'";
+            SqlConnection conn = ConnectToDB();
+            SqlCommand cmd = new SqlCommand(query, conn);
+
+            try
+            {
+                int tempCounter = 0;
+                int customerId = -1;
+                conn.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        customerId = Convert.ToInt32(reader["CustomerId"]);
+                        tempCounter++;
+                    }
+                }
+
+                if (tempCounter == 1)
+                {
+                    return customerId;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
+
+                return -1;
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+
+        }
+
         public static List<int> GetAllCustomerAccountIds(int customerId)
         {
-            string query = $"SELECET [AccountId] FROM AccountBinder WHERE CustomerId = {customerId}";
+            string query = $"SELECT [AccountId] FROM AccountBinder WHERE CustomerId = {customerId}";
             SqlConnection conn = ConnectToDB();
             SqlCommand cmd = new SqlCommand(query, conn);
             List<int> accountIds = new List<int>();
@@ -200,7 +363,8 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
 
                 return new List<int>();
             }
@@ -215,7 +379,7 @@ namespace CSLBankingSystemBackend.Classes
 
         public static int InsertCustomer(Customer customer)
         {
-            string query = $"INSERT INTO Customers ([FirstName], [Lastname], [Email], [Age], [SocialNum], [PhoneNum], [Address], [ZipCode]) VALUES ('{customer.firstName}', '{customer.lastName}', '{customer.email}', {customer.age}, '{customer.socialNum}', '{customer.phoneNum}', '{customer.address}', {customer.zipCode}); SELECT @@IDENTITY as CustomerId";
+            string query = $"INSERT INTO Customers ([FirstName], [Lastname], [Email], [Password], [Age], [SocialNum], [PhoneNum], [Address], [ZipCode]) VALUES ('{customer.firstName}', '{customer.lastName}', '{customer.email}', '{customer.password}', {customer.age}, '{customer.socialNum}', '{customer.phoneNum}', '{customer.address}', {customer.zipCode}); SELECT @@IDENTITY as CustomerId";
             SqlConnection conn = ConnectToDB();
             SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -236,7 +400,8 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
 
                 return 0;
             }
@@ -284,7 +449,8 @@ namespace CSLBankingSystemBackend.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                string funcName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+                Console.Error.WriteLine($"{funcName} - {ex}");
 
                 return new Dictionary<int, Customer>();
             }
@@ -298,5 +464,23 @@ namespace CSLBankingSystemBackend.Classes
         }
         #endregion
 
+
+
+        private static string GetSHA256Hash(string input)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+                StringBuilder builder = new StringBuilder();
+
+                foreach (Byte b in bytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+
+                return builder.ToString();
+            }
+        }
     }
 }
