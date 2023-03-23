@@ -90,7 +90,10 @@ namespace CSLBankingSystemBackend.Controllers
 
                     if (customer != null)
                     {
-                        string json = JsonSerializer.Serialize(customer);
+
+                        List<Object> loginList = new List<Object>() { customer, token };
+
+                        string json = JsonSerializer.Serialize(loginList);
 
                         return json;
                     }
